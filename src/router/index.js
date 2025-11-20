@@ -4,9 +4,8 @@ import Dashboard from '@/pages/dashboard/dashboard.vue'
 import Registro from '@/pages/dashboard/registro.vue'
 import Matricula from '@/pages/dashboard/matricula.vue'
 // Importación del nuevo componente de profesores
-import RegistroProfesores from '@/pages/dashboard/registroprofesores.vue' 
-
-
+import RegistroProfesores from '@/pages/dashboard/registroprofesores.vue'
+import CrearUsuario from '@/pages/dashboard/crearusuario.vue' 
 const routes = [
   {
     path: '/',
@@ -19,6 +18,7 @@ const routes = [
     name: 'dashboard',
     component: Dashboard,
     children: [
+
       { 
         path: 'registro', 
         component: Registro 
@@ -30,7 +30,11 @@ const routes = [
       { 
         path: 'registroprofesores', // <--- Integración del Registro de Profesores
         component: RegistroProfesores 
-      },         
+      }, 
+     { 
+        path: 'crearusuario', // La URL será /dashboard/crearusuario
+        component: CrearUsuario 
+      }, 
     ]
   },
 ]

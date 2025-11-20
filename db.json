@@ -1,0 +1,27 @@
+{
+  "usuarios": [
+    {
+      "id": "1",
+      "usuario": "admin",
+      "password": "admin3",
+      "nombre": "Administrador Principal",
+      "email": "admin@colegio.edu.co"
+    },
+    {
+      "id": "2",
+      "nombre": "Juan Perez",
+      "username": "Juanp",
+      "email": "juanperez@gmail.com",
+      "password": "juan342",
+      "rol": "Admin"
+    },
+    {
+      "id": "2ece",
+      "nombre": "Vanessa Otero ",
+      "username": "V-otero",
+      "email": "vaneotero@gmail.com",
+      "password": "vane98",
+      "rol": "Admin"
+    }
+  ]
+}

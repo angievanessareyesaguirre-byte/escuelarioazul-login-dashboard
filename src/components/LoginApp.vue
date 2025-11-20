@@ -1,22 +1,69 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
+
+// 1. CORRECCIÓN DE RUTA: Ruta relativa (sube a 'src/', entra a 'services/')
+// Asumiendo que LoginApp.vue está en src/components/
+import authService from '../services/authservice' 
 import escudoLocalUrl from '@/assets/escudo.jpg' 
 
-const visible = ref(false) // Se define 'visible' una sola vez.
+// --- Estado del Formulario ---
+const username = ref('')
+const password = ref('')
+const visible = ref(false)
+const loading = ref(false) // Para deshabilitar el botón durante el envío
+const error = ref('')       // Para mostrar mensajes de error
+
 const router = useRouter()
-const login = () => router.push('dashboard')
+
+// Reglas de validación simples
+const rules = {
+  required: value => !!value || 'Este campo es requerido'
+}
+
+/**
+ * Función que maneja el proceso de Login (Conexión a db.json)
+ */
+const handleLogin = async () => {
+    // 1. Validar campos básicos
+    if (!username.value || !password.value) {
+        error.value = 'Por favor, ingrese usuario y contraseña.';
+        return;
+    }
+
+    loading.value = true;
+    error.value = ''; // Limpiar errores anteriores
+
+    try {
+        // 2. Llamar al servicio de autenticación con los valores del formulario
+        const result = await authService.login(username.value, password.value);
+
+        if (result.success) {
+            // 3. Login exitoso: Redirigir al dashboard
+            router.push('/dashboard'); 
+        } else {
+            // 4. Login fallido: Mostrar el mensaje de error del servicio
+            error.value = result.message;
+        }
+    } catch (err) {
+        // Manejar errores de conexión
+        console.error("Error inesperado durante el login:", err)
+        error.value = 'Error de conexión. Verifique que la API (JSON Server) esté corriendo.';
+    } finally {
+        loading.value = false;
+    }
+}
 </script>
 
 <template>
   <div>
     <v-row class="mt-2 d-flex justify-center">
-      <v-col cols="4" class="fondoimagen d-flex flex-column justify-center align-center">
+      <v-col cols="5" class="fondoimagen d-flex flex-column justify-center align-center">
         <div class="mt-4 mb-4" style="width: 150px; height: 150px;">
           <v-img
             :src="escudoLocalUrl" 
             alt="Escudo Colegio Río Azul"
-            contain  height="100%"
+            contain  height="100%"
             width="100%"
           ></v-img>
         </div>
@@ -35,35 +82,54 @@ const login = () => router.push('dashboard')
         </div>
       </v-col>
 
-      <v-col cols="5" class="fondo">
+      <v-col cols="6" class="fondo">
         <v-card
           class="mx-auto pa-8 pb-6"
           elevation="8"
           rounded="lg"
-          max-width="350" 
-          height="350"
+          max-width="450" 
+          height="400"
         >
-          <div class="text-subtitle-1 text-medium-emphasis">Cuenta</div>
+            <v-alert
+                v-if="error"
+                type="error"
+                variant="tonal"
+                class="mb-4"
+                density="compact"
+                @click:close="error = ''"
+                closable
+            >
+                {{ error }}
+            </v-alert>
+
+          <div class="text-subtitle-1 text-medium-emphasis">Usuario</div>
 
           <v-text-field
             density="compact"
-            placeholder="Email address"
-            prepend-inner-icon="mdi-email-outline"
+            placeholder="Ingrese su usuario"
+            prepend-inner-icon="mdi-account-outline" 
             variant="outlined"
+            v-model="username"              
+            :rules="[rules.required]"
+            :disabled="loading"
+            class="mb-2"
           ></v-text-field>
 
-          <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
-           contraseña
-          </div>
+          <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">Contraseña</div>
 
           <v-text-field
             :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-            :type="visible ? 'text' : 'contraseña'"
+            :type="visible ? 'text' : 'password'"
             density="compact"
-            placeholder="ingresa tu contraseña"
+            placeholder="Ingrese su contraseña"
             prepend-inner-icon="mdi-lock-outline"
             variant="outlined"
             @click:append-inner="visible = !visible"
+            v-model="password"              
+            :rules="[rules.required]"
+            :disabled="loading"
+            @keydown.enter="handleLogin"
+            class="mb-4"
           ></v-text-field>
 
           <v-btn
@@ -71,28 +137,21 @@ const login = () => router.push('dashboard')
             size="large"
             variant="tonal"
             block
-            @click="login" >
+            @click="handleLogin"           
+            :loading="loading" 
+            :disabled="loading"
+          >
             Log In
           </v-btn>
 
           <a
-            class="text-caption text-decoration-none text-blue d-block text-center mb-4" href="#"
+            class="text-caption text-decoration-none text-blue d-block text-center" href="#"
             rel="noopener noreferrer"
             target="_blank"
           >
             Olvidaste la contraseña?
           </a>
 
-          <v-card-text class="text-center pa-0"> 
-            <a
-              class="text-blue text-decoration-none"
-              href="#"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Sign up now <v-icon icon="mdi-chevron-right"></v-icon>
-            </a>
-          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -102,8 +161,7 @@ const login = () => router.push('dashboard')
 <style scoped>
 .fondo {
   background-color: rgb(243, 226, 179);
-}
-
+}  
 .fondoimagen {
   background-color: rgb(113, 180, 243);
 }

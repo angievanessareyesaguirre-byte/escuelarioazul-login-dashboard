@@ -51,8 +51,16 @@
           value="Matricula" 
           to="/dashboard/matricula" 
         ></v-list-item>
+
+       <v-list-item 
+          prepend-icon="mdi-account-plus" 
+          title="Crear Usuario" 
+          value="crearusuario" 
+          to="/dashboard/crearusuario" 
+        ></v-list-item>
         
       </v-list>
+        
     </v-navigation-drawer>
     
     <v-main>
